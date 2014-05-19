@@ -69,13 +69,13 @@ class PluginTeamstatusnotifier extends ServicePlugin
         $template = $templategateway->getEmailTemplateByName("Team Status Activity Template");
 
         $basicSubject               = $template->getSubject();
-        $basicBody                  = $template->getContents(true);
+        $basicBody                  = $template->getContents();
 
         $template = $templategateway->getEmailTemplateByName("Team Status Activity Dynamic Block Template");
-        $basicBodyDynamicBlock      = $template->getContents(true);
+        $basicBodyDynamicBlock      = $template->getContents();
 
         $template = $templategateway->getEmailTemplateByName("Team Status Activity Reply Template");
-        $basicBodyReply             = $template->getContents(true);
+        $basicBodyReply             = $template->getContents();
 
         $lastRun = $this->settings->get('plugin_teamstatusnotifier_lastrun');
         $userGateway = new UserGateway();
@@ -94,9 +94,7 @@ class PluginTeamstatusnotifier extends ServicePlugin
             $subject = $basicSubject;
             $body    = $basicBody;
             $tempBodyDynamicBlock = $body;
-            foreach ($tempBodyDynamicBlock as $mailType => $trash) {
-                $tempBodyDynamicBlock[$mailType] = '';
-            }
+            $tempBodyDynamicBlock = '';
 
             $query4 =  "SELECT ts.userid, ts.userstatus,ts.status_datetime,ts.replyid ";
             $query4 .= "FROM team_status ts left join users u on ts.userid=u.id ";
@@ -114,43 +112,31 @@ class PluginTeamstatusnotifier extends ServicePlugin
                     if(isset($useridreplied)){
                         $userreplied = new user($useridreplied);
                         $bodyReply = $basicBodyReply;
-                        foreach ($bodyReply as $mailType => $trash) {
-                            $bodyReply[$mailType] = str_replace("[REPLIEDTEAMSTATUSUSERNAME]", $userreplied->getFullName(), $bodyReply[$mailType]);
-                        }
+                        $bodyReply = str_replace("[REPLIEDTEAMSTATUSUSERNAME]", $userreplied->getFullName(), $bodyReply);
                     }else{
-                        foreach ($bodyReply as $mailType => $trash) {
-                            $bodyReply[$mailType] = '';
-                        }
+                        $bodyReply = '';
                     }
                 }else{
-                    foreach ($bodyReply as $mailType => $trash) {
-                        $bodyReply[$mailType] = '';
-                    }
+                    $bodyReply = '';
                 }
 
                 $tsuser = new user($tsuserid);
                 $bodyDynamicBlock = $basicBodyDynamicBlock;
-                foreach ($bodyDynamicBlock as $mailType => $trash) {
-                    $bodyDynamicBlock[$mailType] = str_replace("[TEAMSTATUSUSERNAME]", $tsuser->getFullName(), $bodyDynamicBlock[$mailType]);
-                    $bodyDynamicBlock[$mailType] = str_replace("[TEAMSTATUS]", ($mailType == 'HTML')? nl2br($tsuserstatus): $tsuserstatus, $bodyDynamicBlock[$mailType]);
-                    $bodyDynamicBlock[$mailType] = str_replace("[TEAMSTATUSDATE]", $tsstatus_datetime, $bodyDynamicBlock[$mailType]);
-                    $bodyDynamicBlock[$mailType] = str_replace("[TEAMSTATUSREPLYINFO]", $bodyReply[$mailType], $bodyDynamicBlock[$mailType]);
+                $bodyDynamicBlock = str_replace("[TEAMSTATUSUSERNAME]", $tsuser->getFullName(), $bodyDynamicBlock);
+                $bodyDynamicBlock = str_replace("[TEAMSTATUS]", nl2br($tsuserstatus), $bodyDynamicBlock);
+                $bodyDynamicBlock = str_replace("[TEAMSTATUSDATE]", $tsstatus_datetime, $bodyDynamicBlock);
+                $bodyDynamicBlock = str_replace("[TEAMSTATUSREPLYINFO]", $bodyReply, $bodyDynamicBlock);
 
-                    $tempBodyDynamicBlock[$mailType] .= $bodyDynamicBlock[$mailType];
-                }
+                $tempBodyDynamicBlock .= $bodyDynamicBlock;
             }
 
             if($HaveTeamStatus){
-                foreach ($body as $mailType => $trash) {
-                    $body[$mailType] = str_replace("[TEAMSTATUSDYNAMICBLOCK]", $tempBodyDynamicBlock[$mailType], $body[$mailType]);
-                }
+                $body = str_replace("[TEAMSTATUSDYNAMICBLOCK]", $tempBodyDynamicBlock, $body);
 
                 $from = $this->settings->get('Support E-mail');
                 $fromName = $this->settings->get('Company Name');
 
                 $userid = $user->getId();
-
-                $contentType = $user->isHTMLMails()? MAILGATEWAY_CONTENTTYPE_HTML : MAILGATEWAY_CONTENTTYPE_PLAINTEXT;
 
                 try {
                     $mailGateway->sendMailMessage($body,
@@ -164,7 +150,7 @@ class PluginTeamstatusnotifier extends ServicePlugin
                         'notifications',
                         '',
                         '',
-                        $contentType
+                        MAILGATEWAY_CONTENTTYPE_HTML
                     );
                 } catch ( Exception $e ) {
                     $failedAddressees[] = $uid;
