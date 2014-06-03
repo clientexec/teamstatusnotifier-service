@@ -15,40 +15,40 @@ class PluginTeamstatusnotifier extends ServicePlugin
     function getVariables()
     {
         $variables = array(
-            /*T*/'Plugin Name'/*/T*/   => array(
+            lang('Plugin Name')   => array(
                 'type'          => 'hidden',
-                'description'   => /*T*/''/*/T*/,
-                'value'         => /*T*/'Team Status Notifier'/*/T*/,
+                'description'   => '',
+                'value'         => lang('Team Status Notifier'),
             ),
-            /*T*/'Enabled'/*/T*/       => array(
+            lang('Enabled')       => array(
                 'type'          => 'yesno',
-                'description'   => /*T*/'When enabled, Team Status Notifications are sent by e-mail when this service is triggered.'/*/T*/,
+                'description'   => lang('When enabled, Team Status Notifications are sent by e-mail when this service is triggered.'),
                 'value'         => '0',
             ),
-            /*T*/'Run schedule - Minute'/*/T*/  => array(
+            lang('Run schedule - Minute')  => array(
                 'type'          => 'text',
-                'description'   => /*T*/'Enter number, range, list or steps'/*/T*/,
+                'description'   => lang('Enter number, range, list or steps'),
                 'value'         => '30',
                 'helpid'        => '8',
             ),
-            /*T*/'Run schedule - Hour'/*/T*/  => array(
+            lang('Run schedule - Hour')  => array(
                 'type'          => 'text',
-                'description'   => /*T*/'Enter number, range, list or steps'/*/T*/,
+                'description'   => lang('Enter number, range, list or steps'),
                 'value'         => '*',
             ),
-            /*T*/'Run schedule - Day'/*/T*/  => array(
+            lang('Run schedule - Day')  => array(
                 'type'          => 'text',
-                'description'   => /*T*/'Enter number, range, list or steps'/*/T*/,
+                'description'   => lang('Enter number, range, list or steps'),
                 'value'         => '*',
             ),
-            /*T*/'Run schedule - Month'/*/T*/  => array(
+            lang('Run schedule - Month')  => array(
                 'type'          => 'text',
-                'description'   => /*T*/'Enter number, range, list or steps'/*/T*/,
+                'description'   => lang('Enter number, range, list or steps'),
                 'value'         => '*',
             ),
-            /*T*/'Run schedule - Day of the week'/*/T*/  => array(
+            lang('Run schedule - Day of the week')  => array(
                 'type'          => 'text',
-                'description'   => /*T*/'Enter number in range 0-6 (0 is Sunday) or a 3 letter shortcut (e.g. sun)'/*/T*/,
+                'description'   => lang('Enter number in range 0-6 (0 is Sunday) or a 3 letter shortcut (e.g. sun)'),
                 'value'         => '*',
             ),
         );
