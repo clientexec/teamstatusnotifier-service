@@ -66,16 +66,19 @@ class PluginTeamstatusnotifier extends ServicePlugin
         $mailGateway = new NE_MailGateway();
 
         $templategateway = new AutoresponderTemplateGateway();
-        $template = $templategateway->getEmailTemplateByName("Team Status Activity Template");
+        $template1 = $templategateway->getEmailTemplateByName("Team Status Activity Template");
 
-        $basicSubject               = $template->getSubject();
-        $basicBody                  = $template->getContents();
+        $basicSubjectOriginal = $template1->getSubject();
+        $basicBodyOriginal    = $template1->getContents();
+        $template1id          = $template1->getId();
 
-        $template = $templategateway->getEmailTemplateByName("Team Status Activity Dynamic Block Template");
-        $basicBodyDynamicBlock      = $template->getContents();
+        $template2 = $templategateway->getEmailTemplateByName("Team Status Activity Dynamic Block Template");
+        $basicBodyDynamicBlockOriginal = $template2->getContents();
+        $template2id                   = $template2->getId();
 
-        $template = $templategateway->getEmailTemplateByName("Team Status Activity Reply Template");
-        $basicBodyReply             = $template->getContents();
+        $template3 = $templategateway->getEmailTemplateByName("Team Status Activity Reply Template");
+        $basicBodyReplyOriginal = $template3->getContents();
+        $template3id            = $template3->getId();
 
         $lastRun = $this->settings->get('plugin_teamstatusnotifier_lastrun');
         $userGateway = new UserGateway();
@@ -83,6 +86,33 @@ class PluginTeamstatusnotifier extends ServicePlugin
 
         while (list($uid) = $result2->fetch()) {
             $user = new user($uid);
+
+            $basicSubject          = $basicSubjectOriginal;
+            $basicBody             = $basicBodyOriginal;
+            $basicBodyDynamicBlock = $basicBodyDynamicBlockOriginal;
+            $basicBodyReply        = $basicBodyReplyOriginal;
+
+            if($template1id !== false || $template2id !== false || $template3id !== false){
+                include_once 'modules/admin/models/Translations.php';
+                $languages = CE_Lib::getEnabledLanguages();
+                $translations = new Translations();
+                $languageKey = ucfirst(strtolower($user->getRealLanguage()));
+            }
+
+            if(count($languages) > 1){
+                if($template1id !== false){
+                    $basicSubject = $translations->getValue(EMAIL_SUBJECT, $template1id, $languageKey, $basicSubject);
+                    $basicBody    = $translations->getValue(EMAIL_CONTENT, $template1id, $languageKey, $basicBody);
+                }
+
+                if($template2id !== false){
+                    $basicBodyDynamicBlock = $translations->getValue(EMAIL_CONTENT, $template2id, $languageKey, $basicBodyDynamicBlock);
+                }
+
+                if($template3id !== false){
+                    $basicBodyReply = $translations->getValue(EMAIL_CONTENT, $template3id, $languageKey, $basicBodyReply);
+                }
+            }
 
             $HaveTeamStatus = false;
 
