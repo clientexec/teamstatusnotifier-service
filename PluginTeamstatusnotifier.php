@@ -97,6 +97,7 @@ class PluginTeamstatusnotifier extends ServicePlugin
                 $languages = CE_Lib::getEnabledLanguages();
                 $translations = new Translations();
                 $languageKey = ucfirst(strtolower($user->getRealLanguage()));
+                CE_Lib::setI18n($languageKey);
             }
 
             if(count($languages) > 1){
